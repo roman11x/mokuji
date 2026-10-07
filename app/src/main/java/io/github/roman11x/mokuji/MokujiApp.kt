@@ -1,6 +1,7 @@
 package io.github.roman11x.mokuji
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -11,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 
 /**
@@ -19,10 +21,13 @@ import androidx.compose.ui.res.stringResource
  * Search - query the API
  * Stats - show the user's statistics
  */
-enum class MokujiTab(val labelResID: Int) {
-    LIBRARY(R.string.tab_library),
-    SEARCH(R.string.tab_search),
-    STATS(R.string.tab_statistics)
+enum class MokujiTab(
+    val labelResID: Int,
+    val iconResID: Int
+) {
+    LIBRARY(R.string.tab_library, R.drawable.menu_book_24px),
+    SEARCH(R.string.tab_search, R.drawable.search_24px),
+    STATS(R.string.tab_statistics, R.drawable.bar_chart_24px)
 }
 
 /**
@@ -40,7 +45,12 @@ fun MokujiApp(modifier: Modifier = Modifier) {
                     NavigationBarItem(
                         selected = chosen == tab,
                         onClick = { chosen = tab },
-                        icon = {},
+                        icon = {
+                            Icon(
+                                painter = painterResource(tab.iconResID),
+                                contentDescription = null // no need for a description as there are labels
+                            )
+                        },
                         label = { Text(text = stringResource(id = tab.labelResID)) }
                     )
                 }
