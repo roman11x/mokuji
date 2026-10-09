@@ -3,7 +3,11 @@
     <string name="tab_library">Library</string>
     <string name="tab_search">Search</string>
     <string name="tab_statistics">Statistics</string>
-    <string name="search_manga">Search manga...</string>
+    <string name="search_manga">Search manga…</string>
     <string name="no_results">No Results</string>
     <string name="please_enter_a_query">Please enter a query</string>
+    <string name="format_year">%1$s · %2$d</string>
+    <string name="manga_format">Manga</string>
+    <string name="novel_format">Light Novel</string>
+    <string name="one_shot_format">One-Shot</string>
 </resources>
