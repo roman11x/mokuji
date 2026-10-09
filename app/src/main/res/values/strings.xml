@@ -4,4 +4,6 @@
     <string name="tab_search">Search</string>
     <string name="tab_statistics">Statistics</string>
     <string name="search_manga">Search manga...</string>
+    <string name="no_results">No Results</string>
+    <string name="please_enter_a_query">Please enter a query</string>
 </resources>
