@@ -2,7 +2,13 @@ package io.github.roman11x.mokuji.ui.search
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import io.github.roman11x.mokuji.MokujiApplication
 import io.github.roman11x.mokuji.data.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -69,6 +75,18 @@ class SearchViewModel(
                 SearchUiState.Empty
             } else {
                 SearchUiState.Content(mangaList)
+            }
+        }
+    }
+// recipe viewModel() uses to build SearchViewModel
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = this[APPLICATION_KEY] as MokujiApplication
+                SearchViewModel(
+                    savedStateHandle = createSavedStateHandle(),
+                    searchRepository = application.container.searchRepository
+                )
             }
         }
     }
