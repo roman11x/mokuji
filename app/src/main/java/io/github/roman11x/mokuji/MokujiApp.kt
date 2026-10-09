@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import io.github.roman11x.mokuji.ui.search.SearchScreen
 
 /**
  * The different tabs in the Mokuji app.
@@ -59,7 +60,7 @@ fun MokujiApp(modifier: Modifier = Modifier) {
     ) { innerPadding ->
         when (chosen) {
             MokujiTab.LIBRARY -> Text(modifier = Modifier.padding(innerPadding), text = "Library")
-            MokujiTab.SEARCH -> Text(modifier = Modifier.padding(innerPadding), text = "Search")
+            MokujiTab.SEARCH -> SearchScreen(modifier = Modifier.padding(innerPadding))
             MokujiTab.STATS -> Text(modifier = Modifier.padding(innerPadding), text = "Statistics")
         }
     }
