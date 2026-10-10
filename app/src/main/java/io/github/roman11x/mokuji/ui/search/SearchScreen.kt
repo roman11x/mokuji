@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,7 +40,10 @@ fun SearchScreen(
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
     val query by searchViewModel.query.collectAsStateWithLifecycle()
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         TextField(
             value = query,
             onValueChange = searchViewModel::updateQuery,
@@ -60,17 +62,24 @@ fun SearchScreen(
         )
         when (val state = uiState) {
             is SearchUiState.Content -> {
-                LazyColumn(modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),// weight to fill the available space
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),// weight to fill the available space
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
                     items(state.mangaList, key = { it.id }) { manga ->
                         CardResult(manga = manga)
                     }
                 }
             }
-            SearchUiState.Empty -> Text(text = stringResource(R.string.no_results))
+
+            SearchUiState.Empty -> Text(
+                text = stringResource(R.string.no_results),
+                modifier = Modifier.padding(16.dp)
+            )
+
             SearchUiState.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -80,7 +89,10 @@ fun SearchScreen(
                 }
             }
 
-            SearchUiState.NoQuery -> Text(text = stringResource(R.string.please_enter_a_query))
+            SearchUiState.NoQuery -> Text(
+                text = stringResource(R.string.please_enter_a_query),
+                modifier = Modifier.padding(16.dp),
+            )
         }
     }
 }
