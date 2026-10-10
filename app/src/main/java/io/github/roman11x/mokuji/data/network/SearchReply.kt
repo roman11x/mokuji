@@ -1,5 +1,6 @@
 package io.github.roman11x.mokuji.data.network
 
+import io.github.roman11x.mokuji.data.Manga
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
@@ -8,7 +9,7 @@ import kotlinx.serialization.SerialName
  */
 @Serializable
 data class MangaReply(
-     val data: SearchData?
+    val data: SearchData?
 )
 
 @Serializable
@@ -48,3 +49,18 @@ data class StartDate(
 data class CoverImage(
     val large: String?
 )
+// converts the search media to a Manga object
+fun SearchMedia.toManga(): Manga? {
+    val displayTitle = title?.userPreferred
+        ?: title?.romaji
+        ?: title?.english
+        ?: title?.native ?: return null // no title in any language, drop this manga
+
+    return Manga(
+        id = id,
+        title = displayTitle,
+        coverUrl = coverImage?.large,
+        format = format,
+        year = startDate?.year
+    )
+}
