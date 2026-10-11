@@ -8,6 +8,8 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
+class AniListException(message: String) : Exception(message) // exception for errors from the API
+
 // the query string for the Anilist API
 private const val SEARCH_QUERY = $$"""
 query($search: String) {
@@ -60,6 +62,9 @@ class AniListApi(private val httpClient: HttpClient) {
                 )
             )
         }.body() //get the body of the reply
+        if (reply.errors.isNotEmpty()) { // if there are errors, throw an exception
+            throw AniListException(reply.errors.joinToString(separator = ";") { it.message })
+        }
         return reply
     }
 }
