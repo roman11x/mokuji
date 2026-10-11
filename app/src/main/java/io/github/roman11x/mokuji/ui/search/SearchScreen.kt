@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -125,7 +124,7 @@ private fun formatRes(format: String?): Int? =
 @Composable
 private fun CardResult(manga: Manga, modifier: Modifier = Modifier) {
     // show a placeholder while the image loads or if download fails
-    val emptyBox = ColorPainter(MaterialTheme.colorScheme.secondaryContainer)
+    val emptyBox = ColorPainter(MaterialTheme.colorScheme.secondaryContainer) //Material you secondary color
     val formatResId: Int? = formatRes(manga.format) //The string resource of the manga's format
     val formatText: String? = if (formatResId != null) {
         stringResource(formatResId)
@@ -142,13 +141,15 @@ private fun CardResult(manga: Manga, modifier: Modifier = Modifier) {
         else -> null
     }
     Card(modifier = modifier.fillMaxWidth()) {
-        Row(modifier = Modifier) {
-            if (manga.coverUrl != null ) { // show coverless version if there's no cover
+        Row {
+            if (manga.coverUrl != null) { // show coverless version if there's no cover
                 AsyncImage(
                     model = manga.coverUrl,
                     contentDescription = null,
                     placeholder = emptyBox,
                     error = emptyBox,
+                    modifier = Modifier
+                        .size(width = 60.dp, height = 85.dp)
                 )
             }
             Column(modifier = Modifier.padding(16.dp)) {
@@ -158,7 +159,6 @@ private fun CardResult(manga: Manga, modifier: Modifier = Modifier) {
                 }
             }
         }
-
     }
 }
 
