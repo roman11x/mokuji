@@ -10,4 +10,6 @@
     <string name="manga_format">Manga</string>
     <string name="novel_format">Light Novel</string>
     <string name="one_shot_format">One-Shot</string>
+    <string name="network_error">Network error</string>
+    <string name="anilist_error">Anilist error</string>
 </resources>

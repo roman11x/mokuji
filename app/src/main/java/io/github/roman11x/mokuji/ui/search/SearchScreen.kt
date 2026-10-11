@@ -75,6 +75,11 @@ fun SearchScreen(
                 }
             }
 
+            is SearchUiState.Error -> Text(
+                text = stringResource(state.messageId),
+                modifier = Modifier.padding(16.dp)
+            )
+
             SearchUiState.Empty -> Text(
                 text = stringResource(R.string.no_results),
                 modifier = Modifier.padding(16.dp)

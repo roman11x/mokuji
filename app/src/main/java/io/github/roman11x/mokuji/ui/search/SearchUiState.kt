@@ -14,4 +14,5 @@ sealed interface SearchUiState {
     object Loading: SearchUiState
     object Empty: SearchUiState
     data class Content(val mangaList: List<Manga>): SearchUiState
+    data class Error(val messageId: Int): SearchUiState
 }
