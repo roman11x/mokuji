@@ -9,7 +9,13 @@ import kotlinx.serialization.SerialName
  */
 @Serializable
 data class MangaReply(
-    val data: SearchData?
+    val data: SearchData?,
+    val errors: List<SearchError> = emptyList() //on a successful request, the errors key is missing
+)
+
+@Serializable
+data class SearchError(
+    val message: String
 )
 
 @Serializable
