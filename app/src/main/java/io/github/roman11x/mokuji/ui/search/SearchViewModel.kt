@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.io.IOException
+import java.io.IOException
 
 private const val KEY_QUERY = "query"
 private const val KEY_LAST_SEARCHED_QUERY = "lastSearchedQuery"
@@ -72,26 +72,25 @@ class SearchViewModel(
         }
         _uiState.value = SearchUiState.Loading
         viewModelScope.launch {
-            try{
+            try {
                 val mangaList = searchRepository.searchManga(searchText)
-                
+
                 _uiState.value = if (mangaList.isEmpty()) {
                     SearchUiState.Empty
                 } else {
                     SearchUiState.Content(mangaList)
                 }
-            }
-            catch (e: IOException) {
+            } catch (e: IOException) {
                 _uiState.value = SearchUiState.Error(R.string.network_error)
-            }
-            catch (e: AniListException) {
-                _uiState.value = SearchUiState.Error(R.string.anilist_error)
+            } catch (e: AniListException) {
+                _uiState.value = SearchUiState.Error(R.string.aniList_error)
             }
 
-            
+
         }
     }
-// recipe viewModel() uses to build SearchViewModel
+
+    // recipe viewModel() uses to build SearchViewModel
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

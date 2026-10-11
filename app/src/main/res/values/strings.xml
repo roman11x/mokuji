@@ -10,6 +10,6 @@
     <string name="manga_format">Manga</string>
     <string name="novel_format">Light Novel</string>
     <string name="one_shot_format">One-Shot</string>
-    <string name="network_error">Network error</string>
-    <string name="anilist_error">Anilist error</string>
+    <string name="network_error">Couldn\'t load results, check your connection</string>
+    <string name="aniList_error">AniList couldn\'t answer please try again later </string>
 </resources>
