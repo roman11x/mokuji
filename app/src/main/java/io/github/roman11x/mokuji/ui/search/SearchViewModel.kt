@@ -83,10 +83,8 @@ class SearchViewModel(
             } catch (e: IOException) {
                 _uiState.value = SearchUiState.Error(R.string.network_error)
             } catch (e: AniListException) {
-                _uiState.value = SearchUiState.Error(R.string.aniList_error)
+                _uiState.value = SearchUiState.Error(R.string.anilist_error)
             }
-
-
         }
     }
 

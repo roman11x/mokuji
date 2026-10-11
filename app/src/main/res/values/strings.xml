@@ -11,5 +11,5 @@
     <string name="novel_format">Light Novel</string>
     <string name="one_shot_format">One-Shot</string>
     <string name="network_error">Couldn\'t load results, check your connection</string>
-    <string name="aniList_error">AniList couldn\'t answer please try again later </string>
+    <string name="anilist_error">AniList couldn\'t answer, please try again later</string>
 </resources>
