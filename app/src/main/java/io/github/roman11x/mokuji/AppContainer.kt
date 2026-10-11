@@ -1,7 +1,9 @@
 package io.github.roman11x.mokuji
 
+import io.github.roman11x.mokuji.data.AniListSearchRepository
 import io.github.roman11x.mokuji.data.FakeSearchRepository
 import io.github.roman11x.mokuji.data.SearchRepository
+import io.github.roman11x.mokuji.data.network.AniListApi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -12,7 +14,6 @@ import kotlinx.serialization.json.Json
  * Creates shared objects for the app.
  */
 class AppContainer {
-    val searchRepository: SearchRepository = FakeSearchRepository()
 
     // Creating an HttpClient instance is expensive, so it is initialized once when the process starts.
     private val httpClient = HttpClient(OkHttp) {
@@ -26,4 +27,7 @@ class AppContainer {
             )
         }
     }
+    private val api = AniListApi(httpClient) // Initialize the AniListApi with the HttpClient
+    val searchRepository: SearchRepository = AniListSearchRepository(api)
+
 }
