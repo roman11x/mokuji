@@ -27,7 +27,7 @@ class ToMangaTest {
     }
 
     @Test
-    fun `returns Romanji with userPreferred missing`() {
+    fun `returns Romaji with userPreferred missing`() {
         val media = searchMediaHelper(title = titleHelper(userPreferred = null))
         val title = "Romaji"
         assertEquals(title, media.toManga()?.title)
@@ -76,6 +76,7 @@ class ToMangaTest {
         val media = searchMediaHelper(startDate = null)
         assertNull(media.toManga()?.year)
     }
+
 
     private fun titleHelper(
         userPreferred: String? = "User Preferred",
