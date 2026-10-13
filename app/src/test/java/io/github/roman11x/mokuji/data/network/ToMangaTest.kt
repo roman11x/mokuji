@@ -90,7 +90,7 @@ class ToMangaTest {
     // helper function to create per test SearchMedia
     private fun searchMediaHelper(
         id: Int = 1,
-        title: Title? = Title("User Preferred", "Romaji", "English", "Native"),
+        title: Title? = titleHelper(),
         format: String? = "FORMAT",
         startDate: StartDate? = StartDate(2023),
         coverImage: CoverImage? = CoverImage("COVER_URL")
