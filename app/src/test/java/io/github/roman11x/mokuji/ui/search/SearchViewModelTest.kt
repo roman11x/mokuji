@@ -60,8 +60,67 @@ class SearchViewModelTest {
 
             viewModel.updateQuery("")
             viewModel.search()
+            // no need to use advanceUntilIdle as we are not entering a cocoroutine
             assertEquals(SearchUiState.NoQuery, viewModel.uiState.value)
         }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `a search with no matches changes the state to Empty`() = runTest {
+        val viewModel =
+            SearchViewModel(
+                SavedStateHandle(),
+                FakeSearchRepository()
+            )
+        viewModel.updateQuery("not a manga")
+        viewModel.search()
+        advanceUntilIdle()
+        assertEquals(SearchUiState.Empty, viewModel.uiState.value)
+    }
+
+    @Test
+    fun `search saves the submitted text`() {
+        val handle = SavedStateHandle(mapOf("lastSearchedQuery" to ""))
+
+        val viewModel =
+            SearchViewModel(
+                handle,
+                FakeSearchRepository()
+            )
+        viewModel.updateQuery("monster")
+        viewModel.search()
+        assertEquals("monster", handle.get<String>("lastSearchedQuery"))
+    }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `restores last submitted search after death`() = runTest {
+        val mangaList = listOf(
+            Manga(
+                id = 2,
+                title = "Monster",
+                coverUrl = null,
+                format = "MANGA",
+                year = 1994
+            ),
+            Manga(
+                id = 3,
+                title = "Monster Musume",
+                coverUrl = null,
+                format = "MANGA",
+                year = 2012
+            ),
+        )
+        val handle = SavedStateHandle(mapOf("lastSearchedQuery" to "monster"))
+        val viewModel =
+            SearchViewModel(
+                handle,
+                FakeSearchRepository()
+            )
+        advanceUntilIdle()
+        assertEquals(SearchUiState.Content(mangaList), viewModel.uiState.value)
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
