@@ -1,7 +1,6 @@
 package io.github.roman11x.mokuji
 
 import io.github.roman11x.mokuji.data.AniListSearchRepository
-import io.github.roman11x.mokuji.data.FakeSearchRepository
 import io.github.roman11x.mokuji.data.SearchRepository
 import io.github.roman11x.mokuji.data.network.AniListApi
 import io.ktor.client.HttpClient
