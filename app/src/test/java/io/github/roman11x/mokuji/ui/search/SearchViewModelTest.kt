@@ -1,6 +1,7 @@
 package io.github.roman11x.mokuji.ui.search
 
 import androidx.lifecycle.SavedStateHandle
+import io.github.roman11x.mokuji.data.DelayedFakeSearchRepository
 import io.github.roman11x.mokuji.data.FakeSearchRepository
 import io.github.roman11x.mokuji.data.Manga
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class SearchViewModelTest {
@@ -123,12 +125,6 @@ class SearchViewModelTest {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `submitting blank query while search is in flight updates state to NoQuery`() = runTest {
         val viewModel =
@@ -146,5 +142,49 @@ class SearchViewModelTest {
         assertEquals(SearchUiState.NoQuery, viewModel.uiState.value)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `sequential searches show last result`() = runTest {
+        val mangaList = listOf(
+            Manga(
+                id = 2,
+                title = "Monster",
+                coverUrl = null,
+                format = "MANGA",
+                year = 1994
+            ),
+            Manga(
+                id = 3,
+                title = "Monster Musume",
+                coverUrl = null,
+                format = "MANGA",
+                year = 2012
+            )
+        )
+        val viewModel =
+            SearchViewModel(
+                SavedStateHandle(),
+                DelayedFakeSearchRepository(
+                    mapOf(
+                        "one" to 2000.milliseconds,
+                        "mon" to 1000.milliseconds
+                    )
+                )
+            )
+        viewModel.updateQuery("one")
+        viewModel.search()
+        viewModel.updateQuery("mon")
+        viewModel.search()
+
+        advanceUntilIdle()
+
+        assertEquals(SearchUiState.Content(mangaList), viewModel.uiState.value)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 }
 
