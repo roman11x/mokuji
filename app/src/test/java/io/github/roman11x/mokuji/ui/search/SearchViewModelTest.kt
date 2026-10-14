@@ -128,5 +128,23 @@ class SearchViewModelTest {
         Dispatchers.resetMain()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `submitting blank query while search is in flight updates state to NoQuery`() = runTest {
+        val viewModel =
+            SearchViewModel(
+                SavedStateHandle(),
+                FakeSearchRepository()
+            )
+        viewModel.updateQuery("monster")
+        viewModel.search()
+
+        viewModel.updateQuery("")
+        viewModel.search()
+
+        advanceUntilIdle() //simulate cocoroutine response after blank search was submitted.
+        assertEquals(SearchUiState.NoQuery, viewModel.uiState.value)
+    }
+
 }
 
