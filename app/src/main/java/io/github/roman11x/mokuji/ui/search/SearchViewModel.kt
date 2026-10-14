@@ -12,6 +12,7 @@ import io.github.roman11x.mokuji.MokujiApplication
 import io.github.roman11x.mokuji.R
 import io.github.roman11x.mokuji.data.SearchRepository
 import io.github.roman11x.mokuji.data.network.AniListException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +32,7 @@ class SearchViewModel(
     private val searchRepository: SearchRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.NoQuery)
+    private var searchJob: Job? = null // used to cancel the previous search job
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
     val query: StateFlow<String> = savedStateHandle.getStateFlow(KEY_QUERY, "")
 
@@ -59,6 +61,7 @@ class SearchViewModel(
         val currentQuery = query.value
         // Save last searched query so result can be restored after process death
         savedStateHandle[KEY_LAST_SEARCHED_QUERY] = currentQuery
+        searchJob?.cancel() // cancel the in-flight search job
         loadMangas(currentQuery)
     }
 
@@ -71,7 +74,7 @@ class SearchViewModel(
             return
         }
         _uiState.value = SearchUiState.Loading
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
             try {
                 val mangaList = searchRepository.searchManga(searchText)
 
