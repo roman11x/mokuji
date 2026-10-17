@@ -1,0 +1,24 @@
+name: Tests
+on: # this workflow runs on prs and pushes to main
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      # step 1: Checkout: copy the repository code at one commit
+      - name: Checkout Code
+        uses: actions/checkout@v7
+      # step 2 setup Java/JDK
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+      # step 3 see which JDK the run got
+      - name: Check JDK
+        run: java --version
