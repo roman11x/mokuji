@@ -1,9 +1,12 @@
 package io.github.roman11x.mokuji.ui.search
 
 import androidx.lifecycle.SavedStateHandle
+import io.github.roman11x.mokuji.R
 import io.github.roman11x.mokuji.data.DelayedFakeSearchRepository
+import io.github.roman11x.mokuji.data.ExceptionFakeSearchRepository
 import io.github.roman11x.mokuji.data.FakeSearchRepository
 import io.github.roman11x.mokuji.data.Manga
+import io.github.roman11x.mokuji.data.network.AniListException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -15,6 +18,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 import kotlin.time.Duration.Companion.milliseconds
 
 
@@ -179,6 +183,40 @@ class SearchViewModelTest {
         advanceUntilIdle()
 
         assertEquals(SearchUiState.Content(mangaList), viewModel.uiState.value)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `uiState changes to network error`() = runTest {
+        val viewModel =
+            SearchViewModel(
+                SavedStateHandle(),
+                ExceptionFakeSearchRepository(IOException())
+            )
+
+        viewModel.updateQuery("monster")
+        viewModel.search()
+
+        advanceUntilIdle()
+
+        assertEquals(SearchUiState.Error(R.string.network_error), viewModel.uiState.value)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `uiState changes to AniList error`() = runTest {
+        val viewModel =
+            SearchViewModel(
+                SavedStateHandle(),
+                ExceptionFakeSearchRepository(AniListException("error"))
+            )
+
+        viewModel.updateQuery("monster")
+        viewModel.search()
+
+        advanceUntilIdle()
+
+        assertEquals(SearchUiState.Error(R.string.anilist_error), viewModel.uiState.value)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
