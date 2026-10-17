@@ -83,9 +83,9 @@ class SearchViewModel(
                 } else {
                     SearchUiState.Content(mangaList)
                 }
-            } catch (e: IOException) {
+            }/* catch (e: IOException) {
                 _uiState.value = SearchUiState.Error(R.string.network_error)
-            } catch (e: AniListException) {
+            }*/ catch (e: AniListException) {
                 _uiState.value = SearchUiState.Error(R.string.anilist_error)
             }
         }
