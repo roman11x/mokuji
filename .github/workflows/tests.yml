@@ -7,18 +7,21 @@ on: # this workflow runs on prs and pushes to main
     branches:
       - main
 jobs:
-  setup:
+  test:
     runs-on: ubuntu-latest
     steps:
       # step 1: Checkout: copy the repository code at one commit
       - name: Checkout Code
         uses: actions/checkout@v7
-      # step 2 setup Java/JDK
+      # step 2: setup Java/JDK
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '25'
-      # step 3 see which JDK the run got
-      - name: Check JDK
-        run: java --version
+      # step 3: setup Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      # step 4: Run tests
+      - name: Run tests
+        run: ./gradlew testDebugUnitTest
