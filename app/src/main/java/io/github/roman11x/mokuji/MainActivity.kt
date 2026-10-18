@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
     private val loginLauncher = AuthTabIntent.registerActivityResultLauncher(this) { result ->
         if (result.resultCode == AuthTabIntent.RESULT_OK) {
             val token = parseToken(result.resultUri?.fragment)
-            saveToken(token ?: "")
+            saveToken(token)
         }
     }
 
@@ -70,11 +70,12 @@ private fun handleAuthRedirect(incomingIntent: Intent?) {
 
     if (uri != null) {
         val token = parseToken(uri.fragment)
-        saveToken(token ?: "")
+        saveToken(token)
     }
 }
 
-private fun saveToken(token: String) {
+private fun saveToken(token: String?) {
+    if (token == null) return
     Log.d(TAG, "tokenIsBlank=${token.isBlank()}")
 }
 
