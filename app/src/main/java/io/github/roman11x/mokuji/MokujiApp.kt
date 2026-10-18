@@ -1,6 +1,7 @@
 package io.github.roman11x.mokuji
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -35,7 +36,7 @@ enum class MokujiTab(
  * The main Mokuji app.
  */
 @Composable
-fun MokujiApp(modifier: Modifier = Modifier) {
+fun MokujiApp(onLogin: () -> Unit, modifier: Modifier = Modifier) {
     var chosen by rememberSaveable { mutableStateOf(MokujiTab.LIBRARY) }
 
     Scaffold(
@@ -59,9 +60,16 @@ fun MokujiApp(modifier: Modifier = Modifier) {
         }
     ) { innerPadding ->
         when (chosen) {
-            MokujiTab.LIBRARY -> Text(modifier = Modifier.padding(innerPadding), text = "Library")
+            MokujiTab.LIBRARY -> LoginButton(onLogin = onLogin, modifier = Modifier.padding(innerPadding))
             MokujiTab.SEARCH -> SearchScreen(modifier = Modifier.padding(innerPadding))
             MokujiTab.STATS -> Text(modifier = Modifier.padding(innerPadding), text = "Statistics")
         }
+    }
+}
+
+@Composable
+fun LoginButton(onLogin: () -> Unit, modifier: Modifier = Modifier) {
+    Button(onClick = onLogin, modifier = modifier) {
+        Text(text = "Login")
     }
 }
