@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.Preferences          // "key → valu
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 private const val TOKEN_FILE_NAME = "user_token"
 private val TOKEN_KEY = stringPreferencesKey("token_key")
@@ -26,4 +28,14 @@ class TokenRepository(context: Context) {
             prefs.remove(TOKEN_KEY)
         }
     }
+
+    /**
+     * Returns a [Flow] that emits the current token.
+     * If there's no token it emits null.
+     * This transforms the [Preferences] object into a [String] by mapping the
+     * key-value pairs to the specific value associated with [TOKEN_KEY].
+     *
+     */
+    fun readTokenStream(): Flow<String?> =
+        dataStore.data.map { prefs -> prefs[TOKEN_KEY] }
 }

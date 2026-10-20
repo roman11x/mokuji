@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 /**
  * Creates shared objects for the app.
  */
-class AppContainer(private val context: Context) {
+class AppContainer(context: Context) {
 
     // Creating an HttpClient instance is expensive, so it is initialized once when the process starts.
     private val httpClient = HttpClient(OkHttp) {
