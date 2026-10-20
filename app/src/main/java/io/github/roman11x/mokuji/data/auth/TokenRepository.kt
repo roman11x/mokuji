@@ -16,6 +16,14 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 
 class TokenRepository(context: Context) {
     private val dataStore = context.dataStore
+    /**
+     * Returns a [Flow] that emits the current token.
+     * If there's no token it emits null.
+     * This transforms the [Preferences] object into a [String] by mapping the
+     * key-value pairs to the specific value associated with [TOKEN_KEY].
+     *
+     */
+    val tokenStream = dataStore.data.map { prefs -> prefs[TOKEN_KEY] }
 
     suspend fun saveToken(token: String) {
         dataStore.edit { prefs ->
@@ -28,14 +36,4 @@ class TokenRepository(context: Context) {
             prefs.remove(TOKEN_KEY)
         }
     }
-
-    /**
-     * Returns a [Flow] that emits the current token.
-     * If there's no token it emits null.
-     * This transforms the [Preferences] object into a [String] by mapping the
-     * key-value pairs to the specific value associated with [TOKEN_KEY].
-     *
-     */
-    fun readTokenStream(): Flow<String?> =
-        dataStore.data.map { prefs -> prefs[TOKEN_KEY] }
 }
