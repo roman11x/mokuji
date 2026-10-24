@@ -43,8 +43,6 @@ class LoginViewModel(
     fun save(token: String?) {
         if (token == null) return
 
-        Log.d(TAG, "tokenIsBlank=${token.isBlank()}")
-
         viewModelScope.launch {
             try {
                 tokenRepository.saveToken(token)
