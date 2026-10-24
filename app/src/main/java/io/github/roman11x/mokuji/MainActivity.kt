@@ -2,27 +2,31 @@ package io.github.roman11x.mokuji
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.browser.auth.AuthTabIntent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
+import io.github.roman11x.mokuji.ui.auth.LoginViewModel
 import io.github.roman11x.mokuji.data.auth.parseToken
 import io.github.roman11x.mokuji.ui.theme.MokujiTheme
 
 private const val MOKUJI_CLIENT_ID = "54107"
-private const val TAG = "Mokuji"
+
 
 class MainActivity : ComponentActivity() {
+    // inject the LoginViewModel
+    private val loginViewModel: LoginViewModel by viewModels { LoginViewModel.Factory }
+
     // A property initializer runs while the activity object is created, before onCreate
     // register the login activity launcher
     private val loginLauncher = AuthTabIntent.registerActivityResultLauncher(this) { result ->
         if (result.resultCode == AuthTabIntent.RESULT_OK) {
             val token = parseToken(result.resultUri?.fragment)
-            saveToken(token)
+            loginViewModel.save(token)
         }
     }
 
@@ -60,23 +64,22 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-// helper function for handling intent
-// if the process is alive the intent arrives via the listener
-// if Android kills the app, the intent arrives via the starting intent
-private fun handleAuthRedirect(incomingIntent: Intent?) {
-    val uri = incomingIntent?.data
+    // helper function for handling intent
+    // if the process is alive the intent arrives via the listener
+    // if Android kills the app, the intent arrives via the starting intent
+    private fun handleAuthRedirect(incomingIntent: Intent?) {
+        val uri = incomingIntent?.data
 
-    if (uri != null) {
-        val token = parseToken(uri.fragment)
-        saveToken(token)
+        if (uri != null) {
+            val token = parseToken(uri.fragment)
+            loginViewModel.save(token)
+        }
     }
 }
 
-private fun saveToken(token: String?) {
-    if (token == null) return
-    Log.d(TAG, "tokenIsBlank=${token.isBlank()}")
-}
+
+
+
 
 

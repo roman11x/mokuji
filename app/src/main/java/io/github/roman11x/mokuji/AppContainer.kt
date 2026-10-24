@@ -1,7 +1,9 @@
 package io.github.roman11x.mokuji
 
+import android.content.Context
 import io.github.roman11x.mokuji.data.AniListSearchRepository
 import io.github.roman11x.mokuji.data.SearchRepository
+import io.github.roman11x.mokuji.data.auth.TokenRepository
 import io.github.roman11x.mokuji.data.network.AniListApi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -12,7 +14,7 @@ import kotlinx.serialization.json.Json
 /**
  * Creates shared objects for the app.
  */
-class AppContainer {
+class AppContainer(context: Context) {
 
     // Creating an HttpClient instance is expensive, so it is initialized once when the process starts.
     private val httpClient = HttpClient(OkHttp) {
@@ -28,5 +30,6 @@ class AppContainer {
     }
     private val api = AniListApi(httpClient) // Initialize the AniListApi with the HttpClient
     val searchRepository: SearchRepository = AniListSearchRepository(api)
+    val tokenRepository = TokenRepository(context)
 
 }
