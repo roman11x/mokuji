@@ -19,7 +19,7 @@ class TokenRepository(context: Context) {
     /**
      * Returns a [Flow] that emits the current token.
      * If there's no token it emits null.
-     * This transforms the [Preferences] object into a [String] by mapping the
+     * This transforms the [Preferences] object into a [String?] by mapping the
      * key-value pairs to the specific value associated with [TOKEN_KEY].
      *
      */
