@@ -1,21 +1,33 @@
 package io.github.roman11x.mokuji
 
+import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import io.github.roman11x.mokuji.ui.auth.LoginScreen
+import io.github.roman11x.mokuji.ui.auth.LoginViewModel
 import io.github.roman11x.mokuji.ui.search.SearchScreen
+import io.github.roman11x.mokuji.ui.auth.LoginUiState
 
 /**
  * The different tabs in the Mokuji app.
@@ -36,7 +48,37 @@ enum class MokujiTab(
  * The main Mokuji app.
  */
 @Composable
-fun MokujiApp(onLogin: () -> Unit, modifier: Modifier = Modifier) {
+fun MokujiApp(
+    modifier: Modifier = Modifier,
+    onLogin: () -> Unit,
+    loginViewModel: LoginViewModel = viewModel(factory = LoginViewModel.Factory),
+) {
+    val loginUiState by loginViewModel.uiState.collectAsStateWithLifecycle()
+    Surface(  // Top-level Surface ensures theme background is applied globally
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        when (loginUiState) {
+            is LoginUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is LoginUiState.LoggedIn -> MainAppScaffold()
+            is LoginUiState.LoggedOut -> {
+                LoginScreen(onLogin = onLogin)
+            }
+        }
+    }
+}
+
+// Main Mokuji Screen After the user is logged in
+@Composable
+fun MainAppScaffold(modifier: Modifier = Modifier) {
     var chosen by rememberSaveable { mutableStateOf(MokujiTab.LIBRARY) }
 
     Scaffold(
@@ -60,16 +102,10 @@ fun MokujiApp(onLogin: () -> Unit, modifier: Modifier = Modifier) {
         }
     ) { innerPadding ->
         when (chosen) {
-            MokujiTab.LIBRARY -> LoginButton(onLogin = onLogin, modifier = Modifier.padding(innerPadding))
+            MokujiTab.LIBRARY -> Text(modifier = Modifier.padding(innerPadding), text = "Library")
             MokujiTab.SEARCH -> SearchScreen(modifier = Modifier.padding(innerPadding))
             MokujiTab.STATS -> Text(modifier = Modifier.padding(innerPadding), text = "Statistics")
         }
     }
 }
 
-@Composable
-fun LoginButton(onLogin: () -> Unit, modifier: Modifier = Modifier) {
-    Button(onClick = onLogin, modifier = modifier) {
-        Text(text = "Login")
-    }
-}

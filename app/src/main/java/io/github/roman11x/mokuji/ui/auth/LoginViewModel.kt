@@ -49,7 +49,7 @@ class LoginViewModel(
             try {
                 tokenRepository.saveToken(token)
             } catch (e: IOException) {
-                println("write failed")
+                Log.e(TAG, "Error saving token", e) // v1: failure to write to disk is rare
             }
         }
     }
