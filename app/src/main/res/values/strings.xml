@@ -12,4 +12,6 @@
     <string name="one_shot_format">One-Shot</string>
     <string name="network_error">Couldn\'t load results, check your connection</string>
     <string name="anilist_error">AniList couldn\'t answer, please try again later</string>
+    <string name="track_your_manga_library_with_anilist">Track Your Manga Library With AniList</string>
+    <string name="login_with_anilist">Login With AniList</string>
 </resources>

@@ -9,26 +9,49 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.roman11x.mokuji.MokujiApplication
 import io.github.roman11x.mokuji.data.auth.TokenRepository
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
+
 private const val TAG = "Mokuji"
+
 class LoginViewModel(
     private val tokenRepository: TokenRepository
 ) : ViewModel() {
+    /**
+     * Converts the cold [TokenRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
+     *
+     * - `stateIn` exposes a synchronous [.value] property for Compose and shares a single
+     *   DataStore collection pipeline among all subscribers.
+     * - `initialValue = LoginUiState.Loading` displays a loading state while reading the initial token.
+     * - `WhileSubscribed(5_000)` keeps the upstream collection active during brief subscriber drops
+     *   (such as screen rotations), while pausing collection 5 seconds after the UI is hidden.
+     */
+
+    val uiState: StateFlow<LoginUiState> = tokenRepository.tokenStream.map { token ->
+        if (token == null) LoginUiState.LoggedOut
+        else LoginUiState.LoggedIn
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5_000),
+        initialValue = LoginUiState.Loading
+    )
 
     fun save(token: String?) {
         if (token == null) return
-
-        Log.d(TAG, "tokenIsBlank=${token.isBlank()}")
 
         viewModelScope.launch {
             try {
                 tokenRepository.saveToken(token)
             } catch (e: IOException) {
-                println("write failed")
+                Log.e(TAG, "Error saving token", e) // v1: failure to write to disk is rare
             }
         }
     }
+
     // recipe viewModels() uses to build LoginViewModel
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
@@ -41,3 +64,5 @@ class LoginViewModel(
         }
     }
 }
+
+

@@ -10,8 +10,8 @@ import androidx.browser.auth.AuthTabIntent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
-import io.github.roman11x.mokuji.ui.auth.LoginViewModel
 import io.github.roman11x.mokuji.data.auth.parseToken
+import io.github.roman11x.mokuji.ui.auth.LoginViewModel
 import io.github.roman11x.mokuji.ui.theme.MokujiTheme
 
 private const val MOKUJI_CLIENT_ID = "54107"
@@ -45,7 +45,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // handle cold start
         handleAuthRedirect(intent)
         /**
