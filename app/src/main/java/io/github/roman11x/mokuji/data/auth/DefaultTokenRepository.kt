@@ -14,7 +14,7 @@ private val TOKEN_KEY = stringPreferencesKey("token_key")
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = TOKEN_FILE_NAME)
 
-class AniListTokenRepository(context: Context): TokenRepository {
+class DefaultTokenRepository(context: Context): TokenRepository {
     private val dataStore = context.dataStore
     /**
      * Returns a [Flow] that emits the current token.
