@@ -23,7 +23,7 @@ class LoginViewModel(
     private val tokenRepository: TokenRepository
 ) : ViewModel() {
     /**
-     * Converts the cold [DefaultTokenRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
+     * Converts the cold [TokenRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
      *
      * - `stateIn` exposes a synchronous [.value] property for Compose and shares a single
      *   DataStore collection pipeline among all subscribers.
