@@ -58,7 +58,24 @@ class LoginViewModelTest {
         viewModel.save("token")
 
         advanceUntilIdle()
+
         assertEquals(LoginUiState.LoggedIn, viewModel.uiState.value)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `saving a null token writes nothing`() = runTest {
+        val viewModel = LoginViewModel(FakeTokenRepository())
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.save(null)
+
+        advanceUntilIdle()
+
+        assertEquals(LoginUiState.LoggedOut, viewModel.uiState.value)
     }
 
 
