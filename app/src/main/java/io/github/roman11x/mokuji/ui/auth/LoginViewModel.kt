@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.roman11x.mokuji.MokujiApplication
-import io.github.roman11x.mokuji.data.auth.DefaultTokenRepository
 import io.github.roman11x.mokuji.data.auth.TokenRepository
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow

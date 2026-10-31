@@ -78,6 +78,12 @@ class LoginViewModelTest {
         assertEquals(LoginUiState.LoggedOut, viewModel.uiState.value)
     }
 
+    @Test
+    fun `before file delivers the state is loading`() {
+        val viewModel = LoginViewModel(FakeTokenRepository())
+        assertEquals(LoginUiState.Loading, viewModel.uiState.value)
+    }
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
