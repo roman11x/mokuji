@@ -3,6 +3,7 @@ package io.github.roman11x.mokuji
 import android.content.Context
 import io.github.roman11x.mokuji.data.AniListSearchRepository
 import io.github.roman11x.mokuji.data.SearchRepository
+import io.github.roman11x.mokuji.data.auth.AniListTokenRepository
 import io.github.roman11x.mokuji.data.auth.TokenRepository
 import io.github.roman11x.mokuji.data.network.AniListApi
 import io.ktor.client.HttpClient
@@ -30,6 +31,6 @@ class AppContainer(context: Context) {
     }
     private val api = AniListApi(httpClient) // Initialize the AniListApi with the HttpClient
     val searchRepository: SearchRepository = AniListSearchRepository(api)
-    val tokenRepository = TokenRepository(context)
+    val tokenRepository: TokenRepository = AniListTokenRepository(context)
 
 }

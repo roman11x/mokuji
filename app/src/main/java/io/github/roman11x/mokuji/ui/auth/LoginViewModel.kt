@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.roman11x.mokuji.MokujiApplication
+import io.github.roman11x.mokuji.data.auth.AniListTokenRepository
 import io.github.roman11x.mokuji.data.auth.TokenRepository
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +23,7 @@ class LoginViewModel(
     private val tokenRepository: TokenRepository
 ) : ViewModel() {
     /**
-     * Converts the cold [TokenRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
+     * Converts the cold [AniListTokenRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
      *
      * - `stateIn` exposes a synchronous [.value] property for Compose and shares a single
      *   DataStore collection pipeline among all subscribers.
