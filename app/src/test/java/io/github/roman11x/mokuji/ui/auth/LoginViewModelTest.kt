@@ -35,6 +35,18 @@ class LoginViewModelTest {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `existing token means logged in`() = runTest {
+        val viewModel = LoginViewModel(FakeTokenRepository("token"))
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        assertEquals(LoginUiState.LoggedIn, viewModel.uiState.value)
+    }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     @After
     fun tearDown() {
         Dispatchers.resetMain()
