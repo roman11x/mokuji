@@ -1,12 +1,15 @@
 package io.github.roman11x.mokuji.data.network
 
+import io.github.roman11x.mokuji.data.auth.TokenRepository
 import kotlinx.serialization.Serializable
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.flow.first
 
 class AniListException(message: String) : Exception(message) // exception for errors from the API
 
@@ -36,10 +39,10 @@ query($search: String) {
 
 // the query string for the viewer
 private const val VIEWER_QUERY = """
-    {
-  Viewer {   # "the account that owns the token in the Authorization header"
-    id       # that account's number on AniList
-    name     # that account's username
+  {
+  Viewer {
+    id
+    name
   }
 }
 """
@@ -77,9 +80,30 @@ class AniListApi(private val httpClient: HttpClient) {
                 )
             )
         }.body() //get the body of the reply
-        if (reply.errors.isNotEmpty()) { // if there are errors, throw an exception
-            throw AniListException(reply.errors.joinToString(separator = ";") { it.message })
-        }
+
+        checkErrors(reply.errors)
         return reply
     }
+
+    suspend fun getViewer(token: String): ViewerReply {
+        val reply: ViewerReply = httpClient.post(ANILIST_URL) {
+            contentType(ContentType.Application.Json)
+            bearerAuth(token)
+            setBody(
+                ViewerRequest(
+                    query = VIEWER_QUERY
+                )
+            )
+        }.body() //get the body of the reply
+
+        checkErrors(reply.errors)
+        return reply
+    }
+
+    private fun checkErrors(errors: List<AniListError>) { // if there are errors, throw an exception
+        if (errors.isNotEmpty()) {
+            throw AniListException(errors.joinToString(separator = ";") { it.message })
+        }
+    }
 }
+
