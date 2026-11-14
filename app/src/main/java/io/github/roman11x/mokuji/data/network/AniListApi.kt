@@ -1,6 +1,5 @@
 package io.github.roman11x.mokuji.data.network
 
-import io.github.roman11x.mokuji.data.auth.TokenRepository
 import kotlinx.serialization.Serializable
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -9,7 +8,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.flow.first
 
 class AniListException(message: String) : Exception(message) // exception for errors from the API
 
@@ -85,7 +83,7 @@ class AniListApi(private val httpClient: HttpClient) {
         return reply
     }
 
-    suspend fun getViewer(token: String): ViewerReply {
+    suspend fun queryViewer(token: String): ViewerReply {
         val reply: ViewerReply = httpClient.post(ANILIST_URL) {
             contentType(ContentType.Application.Json)
             bearerAuth(token)
