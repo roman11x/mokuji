@@ -15,6 +15,7 @@ import io.github.roman11x.mokuji.data.network.AniListException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -72,13 +73,18 @@ class LoginViewModel(
     private suspend fun checkToken() {
         try {
             val user = viewerRepository.getViewer()
+            try {
+                authRepository.saveId(user.id) // save the corresponding user id to the token
+            } catch (e: IOException) {
+                Log.e(TAG, "Error saving user id", e)
+            }
         } catch (e: IOException) {
-            Log.e(TAG, "Network Error", e)
+            Log.e(TAG, "Network Error", e) // v1: failure to write to disk is rare
         } catch (e: AniListException) {
             Log.e(TAG, e.message, e)
         } catch (e: InvalidTokenException) { // the token is invalid, delete it so the user can log in again
             try {
-                authRepository.deleteToken()
+                authRepository.clearAuth()
             } catch (ex: IOException) {
                 Log.e(TAG, "error deleting token", ex) // v1: failure to write to disk is rare
             }

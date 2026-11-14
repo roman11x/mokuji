@@ -15,7 +15,7 @@ class FakeAuthRepository(
         tokenStream.value = token
     }
 
-    override suspend fun deleteToken() {
+    override suspend fun clearAuth() {
         tokenStream.value = null
     }
 
