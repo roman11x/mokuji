@@ -1,6 +1,6 @@
 package io.github.roman11x.mokuji.data
 
-import io.github.roman11x.mokuji.data.auth.TokenRepository
+import io.github.roman11x.mokuji.data.auth.AuthRepository
 import io.github.roman11x.mokuji.data.network.AniListApi
 import io.github.roman11x.mokuji.data.network.AniListException
 import io.github.roman11x.mokuji.data.network.ViewerReply
@@ -15,11 +15,11 @@ class InvalidTokenException(message: String) : Exception(message)
 
 class DefaultViewerRepository(
     private val api: AniListApi,
-    private val tokenRepository: TokenRepository
+    private val authRepository: AuthRepository
 ) : ViewerRepository {
     override suspend fun getViewer(): User {
         val token =
-            tokenRepository.tokenStream.first() ?: throw InvalidTokenException("No token is saved")
+            authRepository.tokenStream.first() ?: throw InvalidTokenException("No token is saved")
 
         val reply: ViewerReply = try {
             api.fetchViewer(token)

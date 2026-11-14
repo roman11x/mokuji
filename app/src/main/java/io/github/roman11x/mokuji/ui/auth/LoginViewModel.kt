@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.roman11x.mokuji.MokujiApplication
 import io.github.roman11x.mokuji.data.InvalidTokenException
 import io.github.roman11x.mokuji.data.ViewerRepository
-import io.github.roman11x.mokuji.data.auth.TokenRepository
+import io.github.roman11x.mokuji.data.auth.AuthRepository
 import io.github.roman11x.mokuji.data.network.AniListException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -23,11 +23,11 @@ import java.io.IOException
 private const val TAG = "Mokuji"
 
 class LoginViewModel(
-    private val tokenRepository: TokenRepository,
+    private val authRepository: AuthRepository,
     private val viewerRepository: ViewerRepository
 ) : ViewModel() {
     /**
-     * Converts the cold [TokenRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
+     * Converts the cold [AuthRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
      *
      * - `stateIn` exposes a synchronous [.value] property for Compose and shares a single
      *   DataStore collection pipeline among all subscribers.
@@ -44,7 +44,7 @@ class LoginViewModel(
         }
     }
 
-    val uiState: StateFlow<LoginUiState> = tokenRepository.tokenStream.map { token ->
+    val uiState: StateFlow<LoginUiState> = authRepository.tokenStream.map { token ->
         if (token == null) LoginUiState.LoggedOut
         else LoginUiState.LoggedIn
     }.stateIn(
@@ -60,7 +60,7 @@ class LoginViewModel(
 
         authJob = viewModelScope.launch {
             try {
-                tokenRepository.saveToken(token)
+                authRepository.saveToken(token)
                 checkToken() // validate the newly saved token
             } catch (e: IOException) {
                 Log.e(TAG, "Error saving token", e) // v1: failure to write to disk is rare
@@ -78,7 +78,7 @@ class LoginViewModel(
             Log.e(TAG, e.message, e)
         } catch (e: InvalidTokenException) { // the token is invalid, delete it so the user can log in again
             try {
-                tokenRepository.deleteToken()
+                authRepository.deleteToken()
             } catch (ex: IOException) {
                 Log.e(TAG, "error deleting token", ex) // v1: failure to write to disk is rare
             }
@@ -91,7 +91,7 @@ class LoginViewModel(
             initializer {
                 val application = this[APPLICATION_KEY] as MokujiApplication
                 LoginViewModel(
-                    tokenRepository = application.container.tokenRepository,
+                    authRepository = application.container.authRepository,
                     viewerRepository = application.container.viewerRepository
                 )
             }

@@ -5,8 +5,8 @@ import io.github.roman11x.mokuji.data.AniListSearchRepository
 import io.github.roman11x.mokuji.data.DefaultViewerRepository
 import io.github.roman11x.mokuji.data.SearchRepository
 import io.github.roman11x.mokuji.data.ViewerRepository
-import io.github.roman11x.mokuji.data.auth.DefaultTokenRepository
-import io.github.roman11x.mokuji.data.auth.TokenRepository
+import io.github.roman11x.mokuji.data.auth.DefaultAuthRepository
+import io.github.roman11x.mokuji.data.auth.AuthRepository
 import io.github.roman11x.mokuji.data.network.AniListApi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -33,8 +33,8 @@ class AppContainer(context: Context) {
     }
     private val api = AniListApi(httpClient) // Initialize the AniListApi with the HttpClient
     val searchRepository: SearchRepository = AniListSearchRepository(api)
-    val tokenRepository: TokenRepository = DefaultTokenRepository(context)
+    val authRepository: AuthRepository = DefaultAuthRepository(context)
 
-    val viewerRepository: ViewerRepository = DefaultViewerRepository(api, tokenRepository)
+    val viewerRepository: ViewerRepository = DefaultViewerRepository(api, authRepository)
 
 }
