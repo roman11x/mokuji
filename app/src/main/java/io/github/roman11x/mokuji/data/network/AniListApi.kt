@@ -34,6 +34,16 @@ query($search: String) {
 }
 """
 
+// the query string for the viewer
+private const val VIEWER_QUERY = """
+    {
+  Viewer {   # "the account that owns the token in the Authorization header"
+    id       # that account's number on AniList
+    name     # that account's username
+  }
+}
+"""
+
 // we need to convert the query and the variables to JSON
 // so that the API can understand them
 @Serializable
@@ -45,6 +55,11 @@ data class SearchVariables(
 data class SearchRequest(
     val query: String, // the query string
     val variables: SearchVariables // the variables for the query
+)
+
+@Serializable
+data class ViewerRequest(
+    val query: String
 )
 
 private const val ANILIST_URL =
