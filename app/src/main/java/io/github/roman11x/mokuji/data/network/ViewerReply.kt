@@ -30,7 +30,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ViewerReply(
     val data: ViewerData?,
-    val errors: List<SearchError> = emptyList()
+    val errors: List<AniListError> = emptyList()
 )
 
 @Serializable
