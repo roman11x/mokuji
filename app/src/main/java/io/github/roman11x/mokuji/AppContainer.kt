@@ -2,7 +2,9 @@ package io.github.roman11x.mokuji
 
 import android.content.Context
 import io.github.roman11x.mokuji.data.AniListSearchRepository
+import io.github.roman11x.mokuji.data.DefaultViewerRepository
 import io.github.roman11x.mokuji.data.SearchRepository
+import io.github.roman11x.mokuji.data.ViewerRepository
 import io.github.roman11x.mokuji.data.auth.DefaultTokenRepository
 import io.github.roman11x.mokuji.data.auth.TokenRepository
 import io.github.roman11x.mokuji.data.network.AniListApi
@@ -32,5 +34,7 @@ class AppContainer(context: Context) {
     private val api = AniListApi(httpClient) // Initialize the AniListApi with the HttpClient
     val searchRepository: SearchRepository = AniListSearchRepository(api)
     val tokenRepository: TokenRepository = DefaultTokenRepository(context)
+
+    val viewerRepository: ViewerRepository = DefaultViewerRepository(api, tokenRepository)
 
 }

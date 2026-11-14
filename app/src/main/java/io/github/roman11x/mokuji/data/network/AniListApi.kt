@@ -83,7 +83,7 @@ class AniListApi(private val httpClient: HttpClient) {
         return reply
     }
 
-    suspend fun queryViewer(token: String): ViewerReply {
+    suspend fun fetchViewer(token: String): ViewerReply {
         val reply: ViewerReply = httpClient.post(ANILIST_URL) {
             contentType(ContentType.Application.Json)
             bearerAuth(token)
