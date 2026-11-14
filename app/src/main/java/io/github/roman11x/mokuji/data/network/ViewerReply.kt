@@ -1,5 +1,7 @@
 package io.github.roman11x.mokuji.data.network
 
+import io.github.roman11x.mokuji.data.Manga
+import io.github.roman11x.mokuji.data.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -43,3 +45,7 @@ data class Viewer(
     val id: Int,
     val name: String
 )
+// converts the returned Viewer to a User
+fun Viewer.toUser(): User {
+    return User(id = id)
+}
