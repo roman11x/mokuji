@@ -15,7 +15,6 @@ import io.github.roman11x.mokuji.data.network.AniListException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -25,7 +24,8 @@ private const val TAG = "Mokuji"
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
-    private val viewerRepository: ViewerRepository
+    private val viewerRepository: ViewerRepository,
+    private val log: (String?, Exception) -> Unit = { msg, ex -> Log.e(TAG, msg, ex) }
 ) : ViewModel() {
     /**
      * Converts the cold [AuthRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
@@ -64,7 +64,7 @@ class LoginViewModel(
                 authRepository.saveToken(token)
                 checkToken() // validate the newly saved token
             } catch (e: IOException) {
-                Log.e(TAG, "Error saving token", e) // v1: failure to write to disk is rare
+                log("Error saving token", e) // v1: failure to write to disk is rare
             }
         }
     }
@@ -76,17 +76,17 @@ class LoginViewModel(
             try {
                 authRepository.saveId(user.id) // save the corresponding user id to the token
             } catch (e: IOException) {
-                Log.e(TAG, "Error saving user id", e)
+                log("Error saving user id", e)
             }
         } catch (e: IOException) {
-            Log.e(TAG, "Network Error", e) // v1: failure to write to disk is rare
+            log("Network Error", e)
         } catch (e: AniListException) {
-            Log.e(TAG, e.message, e)
+            log(e.message, e)
         } catch (e: InvalidTokenException) { // the token is invalid, delete it so the user can log in again
             try {
                 authRepository.clearAuth()
             } catch (ex: IOException) {
-                Log.e(TAG, "error deleting token", ex) // v1: failure to write to disk is rare
+                log("error deleting token", ex) // v1: failure to write to disk is rare
             }
         }
     }
