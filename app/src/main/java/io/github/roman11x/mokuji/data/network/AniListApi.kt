@@ -3,6 +3,7 @@ package io.github.roman11x.mokuji.data.network
 import kotlinx.serialization.Serializable
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -34,6 +35,16 @@ query($search: String) {
 }
 """
 
+// the query string for the viewer
+private const val VIEWER_QUERY = """
+  {
+  Viewer {
+    id
+    name
+  }
+}
+"""
+
 // we need to convert the query and the variables to JSON
 // so that the API can understand them
 @Serializable
@@ -45,6 +56,11 @@ data class SearchVariables(
 data class SearchRequest(
     val query: String, // the query string
     val variables: SearchVariables // the variables for the query
+)
+
+@Serializable
+data class ViewerRequest(
+    val query: String
 )
 
 private const val ANILIST_URL =
@@ -62,9 +78,30 @@ class AniListApi(private val httpClient: HttpClient) {
                 )
             )
         }.body() //get the body of the reply
-        if (reply.errors.isNotEmpty()) { // if there are errors, throw an exception
-            throw AniListException(reply.errors.joinToString(separator = ";") { it.message })
-        }
+
+        checkErrors(reply.errors)
         return reply
     }
+
+    suspend fun fetchViewer(token: String): ViewerReply {
+        val reply: ViewerReply = httpClient.post(ANILIST_URL) {
+            contentType(ContentType.Application.Json)
+            bearerAuth(token)
+            setBody(
+                ViewerRequest(
+                    query = VIEWER_QUERY
+                )
+            )
+        }.body() //get the body of the reply
+
+        checkErrors(reply.errors)
+        return reply
+    }
+
+    private fun checkErrors(errors: List<AniListError>) { // if there are errors, throw an exception
+        if (errors.isNotEmpty()) {
+            throw AniListException(errors.joinToString(separator = ";") { it.message })
+        }
+    }
 }
+

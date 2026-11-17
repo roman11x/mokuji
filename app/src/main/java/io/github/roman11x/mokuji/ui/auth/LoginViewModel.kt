@@ -8,7 +8,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import io.github.roman11x.mokuji.MokujiApplication
-import io.github.roman11x.mokuji.data.auth.TokenRepository
+import io.github.roman11x.mokuji.data.InvalidTokenException
+import io.github.roman11x.mokuji.data.ViewerRepository
+import io.github.roman11x.mokuji.data.auth.AuthRepository
+import io.github.roman11x.mokuji.data.network.AniListException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -19,10 +23,12 @@ import java.io.IOException
 private const val TAG = "Mokuji"
 
 class LoginViewModel(
-    private val tokenRepository: TokenRepository
+    private val authRepository: AuthRepository,
+    private val viewerRepository: ViewerRepository,
+    private val log: (String?, Exception) -> Unit = { msg, ex -> Log.e(TAG, msg, ex) }
 ) : ViewModel() {
     /**
-     * Converts the cold [TokenRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
+     * Converts the cold [AuthRepository.tokenStream] into a hot [StateFlow] of [LoginUiState].
      *
      * - `stateIn` exposes a synchronous [.value] property for Compose and shares a single
      *   DataStore collection pipeline among all subscribers.
@@ -31,7 +37,15 @@ class LoginViewModel(
      *   (such as screen rotations), while pausing collection 5 seconds after the UI is hidden.
      */
 
-    val uiState: StateFlow<LoginUiState> = tokenRepository.tokenStream.map { token ->
+    private var authJob: Job? = null
+
+    init {
+        authJob = viewModelScope.launch { // check token validity on startup
+            checkToken()
+        }
+    }
+
+    val uiState: StateFlow<LoginUiState> = authRepository.tokenStream.map { token ->
         if (token == null) LoginUiState.LoggedOut
         else LoginUiState.LoggedIn
     }.stateIn(
@@ -43,11 +57,36 @@ class LoginViewModel(
     fun save(token: String?) {
         if (token == null) return
 
-        viewModelScope.launch {
+        authJob?.cancel() // cancel any in-flight jobs
+
+        authJob = viewModelScope.launch {
             try {
-                tokenRepository.saveToken(token)
+                authRepository.saveToken(token)
+                checkToken() // validate the newly saved token
             } catch (e: IOException) {
-                Log.e(TAG, "Error saving token", e) // v1: failure to write to disk is rare
+                log("Error saving token", e) // v1: failure to write to disk is rare
+            }
+        }
+    }
+
+
+    private suspend fun checkToken() {
+        try {
+            val user = viewerRepository.getViewer()
+            try {
+                authRepository.saveId(user.id) // save the corresponding user id to the token
+            } catch (e: IOException) {
+                log("Error saving user id", e)
+            }
+        } catch (e: IOException) {
+            log("Network Error", e)
+        } catch (e: AniListException) {
+            log(e.message, e)
+        } catch (e: InvalidTokenException) { // the token is invalid, delete it so the user can log in again
+            try {
+                authRepository.clearAuth()
+            } catch (ex: IOException) {
+                log("error deleting token", ex) // v1: failure to write to disk is rare
             }
         }
     }
@@ -58,7 +97,8 @@ class LoginViewModel(
             initializer {
                 val application = this[APPLICATION_KEY] as MokujiApplication
                 LoginViewModel(
-                    tokenRepository = application.container.tokenRepository
+                    authRepository = application.container.authRepository,
+                    viewerRepository = application.container.viewerRepository
                 )
             }
         }
