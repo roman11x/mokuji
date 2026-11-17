@@ -1,5 +1,6 @@
 package io.github.roman11x.mokuji.ui.auth
 
+import io.github.roman11x.mokuji.data.FakeViewerRepository
 import io.github.roman11x.mokuji.data.auth.FakeAuthRepository
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +27,10 @@ class LoginViewModelTest {
     fun `empty token means logged out`() = runTest {
         // the viewmodel's uiState uses stateIn(WhileSubscribed)
         // so we need to collect the uiState
-        val viewModel = LoginViewModel(FakeAuthRepository())
+        val viewModel = LoginViewModel(
+            FakeAuthRepository(),
+            FakeViewerRepository()
+        )
 
         // start a background coroutine on the test's clock
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -38,7 +42,10 @@ class LoginViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `existing token means logged in`() = runTest {
-        val viewModel = LoginViewModel(FakeAuthRepository("token"))
+        val viewModel = LoginViewModel(
+            FakeAuthRepository("token", 1),
+            FakeViewerRepository()
+        )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -49,7 +56,10 @@ class LoginViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `saving token changes state to logged in`() = runTest {
-        val viewModel = LoginViewModel(FakeAuthRepository())
+        val viewModel = LoginViewModel(
+            FakeAuthRepository(),
+            FakeViewerRepository()
+        )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -65,7 +75,10 @@ class LoginViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `saving a null token writes nothing`() = runTest {
-        val viewModel = LoginViewModel(FakeAuthRepository())
+        val viewModel = LoginViewModel(
+            FakeAuthRepository(),
+            FakeViewerRepository()
+        )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
@@ -80,7 +93,10 @@ class LoginViewModelTest {
 
     @Test
     fun `before file delivers the state is loading`() {
-        val viewModel = LoginViewModel(FakeAuthRepository())
+        val viewModel = LoginViewModel(
+            FakeAuthRepository(),
+            FakeViewerRepository()
+        )
         assertEquals(LoginUiState.Loading, viewModel.uiState.value)
     }
 

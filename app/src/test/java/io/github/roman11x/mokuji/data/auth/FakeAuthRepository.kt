@@ -7,16 +7,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * Used for testing.
  */
 class FakeAuthRepository(
-    initialToken: String? = null //simulate the token on appStart
+    initialToken: String? = null, //simulate the token on appStart
+    initialId: Int? = null //simulate ID on appStart
 ) : AuthRepository {
     override val tokenStream = MutableStateFlow(initialToken)
+    override val idStream = MutableStateFlow(initialId)
 
     override suspend fun saveToken(token: String) {
         tokenStream.value = token
     }
 
+    override suspend fun saveId(id: Int) {
+        idStream.value = id
+    }
+
     override suspend fun clearAuth() {
         tokenStream.value = null
+        idStream.value = null
     }
 
 }
