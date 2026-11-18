@@ -69,6 +69,18 @@ class LoginViewModel(
         }
     }
 
+    fun logout() {
+        authJob?.cancel() // cancel any in-flight jobs
+
+        viewModelScope.launch {
+            try {
+                authRepository.clearAuth() // remove the stored user id and token
+            } catch (e: IOException) {
+                log("Error clearing auth", e)
+            }
+        }
+    }
+
 
     private suspend fun checkToken() {
         try {

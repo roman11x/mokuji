@@ -87,7 +87,7 @@ fun MokujiApp(
                 }
             }
 
-            is LoginUiState.LoggedIn -> MainAppScaffold()
+            is LoginUiState.LoggedIn -> MainAppScaffold(onLogout = { loginViewModel.logout() })
             is LoginUiState.LoggedOut -> {
                 LoginScreen(onLogin = onLogin)
             }
@@ -98,7 +98,7 @@ fun MokujiApp(
 // Main Mokuji Screen After the user is logged in
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainAppScaffold(modifier: Modifier = Modifier) {
+fun MainAppScaffold(onLogout: () -> Unit, modifier: Modifier = Modifier) {
     var chosen by rememberSaveable { mutableStateOf(MokujiTab.LIBRARY) }
     var expanded by remember { mutableStateOf(false) }
 
@@ -133,7 +133,10 @@ fun MainAppScaffold(modifier: Modifier = Modifier) {
                                         contentDescription = null
                                     )
                                 },
-                                onClick = { expanded = false })
+                                onClick = {
+                                    expanded = false
+                                    onLogout()
+                                })
                         }
                     }
                 }
