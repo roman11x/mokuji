@@ -14,4 +14,9 @@
     <string name="anilist_error">AniList couldn\'t answer, please try again later</string>
     <string name="track_your_manga_library_with_anilist">Track Your Manga Library With AniList</string>
     <string name="login_with_anilist">Login With AniList</string>
+    <string name="library_title">My Collection</string>
+    <string name="search_title">Discover Manga</string>
+    <string name="stats_title">My Reading Journey</string>
+    <string name="more_options">More Options</string>
+    <string name="log_out">Log Out</string>
 </resources>

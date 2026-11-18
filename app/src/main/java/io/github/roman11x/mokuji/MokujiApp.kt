@@ -1,12 +1,15 @@
 package io.github.roman11x.mokuji
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -16,32 +19,48 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.roman11x.mokuji.ui.auth.LoginScreen
+import io.github.roman11x.mokuji.ui.auth.LoginUiState
 import io.github.roman11x.mokuji.ui.auth.LoginViewModel
 import io.github.roman11x.mokuji.ui.search.SearchScreen
-import io.github.roman11x.mokuji.ui.auth.LoginUiState
 
 /**
- * The different tabs in the Mokuji app.
- * Library - The user's manga from the API
- * Search - query the API
- * Stats - show the user's statistics
+ * Represents the main navigation tabs in the Mokuji app.
+ *
+ * @property titleResID String resource ID displayed in the top app bar for this tab.
+ * @property labelResID String resource ID displayed in the bottom navigation bar label.
+ * @property iconResID Drawable resource ID displayed in the bottom navigation bar icon.
  */
 enum class MokujiTab(
+    val titleResID: Int,
     val labelResID: Int,
     val iconResID: Int
 ) {
-    LIBRARY(R.string.tab_library, R.drawable.menu_book_24px),
-    SEARCH(R.string.tab_search, R.drawable.search_24px),
-    STATS(R.string.tab_statistics, R.drawable.bar_chart_24px)
+    LIBRARY(
+        R.string.library_title,
+        R.string.tab_library,
+        R.drawable.menu_book_24px
+    ),
+    SEARCH(
+        R.string.search_title,
+        R.string.tab_search,
+        R.drawable.search_24px
+    ),
+    STATS(
+        R.string.stats_title,
+        R.string.tab_statistics,
+        R.drawable.bar_chart_24px
+    )
 }
 
 /**
@@ -68,7 +87,7 @@ fun MokujiApp(
                 }
             }
 
-            is LoginUiState.LoggedIn -> MainAppScaffold()
+            is LoginUiState.LoggedIn -> MainAppScaffold(onLogout = { loginViewModel.logout() })
             is LoginUiState.LoggedOut -> {
                 LoginScreen(onLogin = onLogin)
             }
@@ -77,12 +96,52 @@ fun MokujiApp(
 }
 
 // Main Mokuji Screen After the user is logged in
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainAppScaffold(modifier: Modifier = Modifier) {
+fun MainAppScaffold(onLogout: () -> Unit, modifier: Modifier = Modifier) {
     var chosen by rememberSaveable { mutableStateOf(MokujiTab.LIBRARY) }
+    var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(chosen.titleResID),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
+                actions = {
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(
+                                painter = painterResource(R.drawable.more_vert_24px),
+                                contentDescription = stringResource(R.string.more_options)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = stringResource(R.string.log_out))
+                                },
+                                trailingIcon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.logout_24px),
+                                        contentDescription = null
+                                    )
+                                },
+                                onClick = {
+                                    expanded = false
+                                    onLogout()
+                                })
+                        }
+                    }
+                }
+            )
+        },
         bottomBar = {
             NavigationBar {
                 MokujiTab.entries.forEach { tab ->

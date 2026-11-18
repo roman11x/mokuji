@@ -20,6 +20,7 @@ import kotlinx.io.IOException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 class LoginViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -149,7 +150,7 @@ class LoginViewModelTest {
         val viewModel = LoginViewModel(
             authRepo,
             ExceptionFakeViewerRepository(networkError),
-            log = {_, ex -> loggedErrors.add(ex)}
+            log = { _, ex -> loggedErrors.add(ex) }
         )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -172,7 +173,7 @@ class LoginViewModelTest {
         val viewModel = LoginViewModel(
             authRepo,
             ExceptionFakeViewerRepository(aniListError),
-            log = {_, ex -> loggedErrors.add(ex)}
+            log = { _, ex -> loggedErrors.add(ex) }
         )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -194,7 +195,7 @@ class LoginViewModelTest {
         val viewModel = LoginViewModel(
             authRepo,
             FakeViewerRepository(authRepo),
-            log = {_, _ -> }
+            log = { _, _ -> }
         )
 
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -209,6 +210,86 @@ class LoginViewModelTest {
         assertEquals("token", authRepo.tokenStream.first())
         assertEquals(1, authRepo.idStream.first())
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `logout clears auth and updates state to LoggedOut`() = runTest {
+        val authRepo = FakeAuthRepository("token", 1)
+
+        val viewModel = LoginViewModel(
+            authRepo,
+            FakeViewerRepository(),
+            log = { _, _ -> }
+        )
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.logout()
+
+        advanceUntilIdle()
+
+        assertEquals(LoginUiState.LoggedOut, viewModel.uiState.value)
+        assertNull(authRepo.tokenStream.first())
+        assertNull(authRepo.idStream.first())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `logging out cancels pending token check`() = runTest {
+        val authRepo = FakeAuthRepository("token", 1)
+
+        val viewModel = LoginViewModel(
+            authRepo,
+            FakeViewerRepository(delayMillis = 1000.milliseconds),
+            log = { _, _ -> }
+        )
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.logout()
+
+        advanceUntilIdle()
+
+        assertEquals(LoginUiState.LoggedOut, viewModel.uiState.value)
+        assertNull(authRepo.tokenStream.first())
+        assertNull(authRepo.idStream.first())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `throwing when erasing user credentials keeps the user logged in`() = runTest {
+        val writeError = IOException()
+        val authRepo = FakeAuthRepository(
+            "token",
+            1,
+            clearAuthException = writeError
+        )
+        val loggedErrors = mutableListOf<Exception>()
+
+        val viewModel = LoginViewModel(
+            authRepo,
+            FakeViewerRepository(),
+            log = { _, exception -> loggedErrors.add(exception) }
+        )
+
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.logout()
+
+        advanceUntilIdle()
+
+        assertEquals(LoginUiState.LoggedIn, viewModel.uiState.value)
+        assertEquals("token", authRepo.tokenStream.first())
+        assertEquals(1, authRepo.idStream.first())
+        assertEquals(listOf(writeError), loggedErrors)
+    }
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @After
