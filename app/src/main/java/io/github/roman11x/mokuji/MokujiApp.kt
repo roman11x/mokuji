@@ -1,11 +1,11 @@
 package io.github.roman11x.mokuji
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -22,26 +22,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.roman11x.mokuji.ui.auth.LoginScreen
+import io.github.roman11x.mokuji.ui.auth.LoginUiState
 import io.github.roman11x.mokuji.ui.auth.LoginViewModel
 import io.github.roman11x.mokuji.ui.search.SearchScreen
-import io.github.roman11x.mokuji.ui.auth.LoginUiState
 
 /**
- * The different tabs in the Mokuji app.
- * Library - The user's manga from the API
- * Search - query the API
- * Stats - show the user's statistics
+ * Represents the main navigation tabs in the Mokuji app.
+ *
+ * @property titleResID String resource ID displayed in the top app bar for this tab.
+ * @property labelResID String resource ID displayed in the bottom navigation bar label.
+ * @property iconResID Drawable resource ID displayed in the bottom navigation bar icon.
  */
 enum class MokujiTab(
+    val titleResID: Int,
     val labelResID: Int,
     val iconResID: Int
 ) {
-    LIBRARY(R.string.tab_library, R.drawable.menu_book_24px),
-    SEARCH(R.string.tab_search, R.drawable.search_24px),
-    STATS(R.string.tab_statistics, R.drawable.bar_chart_24px)
+    LIBRARY(
+        R.string.library_title,
+        R.string.tab_library,
+        R.drawable.menu_book_24px
+    ),
+    SEARCH(
+        R.string.search_title,
+        R.string.tab_search,
+        R.drawable.search_24px
+    ),
+    STATS(
+        R.string.stats_title,
+        R.string.tab_statistics,
+        R.drawable.bar_chart_24px
+    )
 }
 
 /**
@@ -77,12 +92,22 @@ fun MokujiApp(
 }
 
 // Main Mokuji Screen After the user is logged in
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainAppScaffold(modifier: Modifier = Modifier) {
     var chosen by rememberSaveable { mutableStateOf(MokujiTab.LIBRARY) }
 
     Scaffold(
         modifier = modifier,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(chosen.titleResID),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                })
+        },
         bottomBar = {
             NavigationBar {
                 MokujiTab.entries.forEach { tab ->
